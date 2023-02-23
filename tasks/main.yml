@@ -1,0 +1,61 @@
+# Copyright (c) 2023, Bennett Samowich <bennett@foolean.org>
+# All rights reserved
+# SPDX short identifier: BSD-3-Clause
+---
+
+# We put the entire role in a block so we can create
+# a role specific tag, which saves the caller from
+# having to do so in their playbook.
+- name: Role foolean/bootloader
+  block:
+
+    - name: CIS | Ensure bootloader password is set
+      become: true
+      ansible.builtin.template:
+        src: 'etc/grub.d/01_users.j2'
+        dest: '/etc/grub.d/01_users'
+        owner: 'root'
+        group: 'root'
+        mode: '0755'
+
+    - name: CIS | Ensure permissions on bootloader config are configured (stat)
+      become: true
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      register: stat_data
+      with_items:
+        - '/boot/grub2/grub.cfg'
+        - '/boot/grub2/grubenv'
+        - '/boot/grub2/user.cfg'
+
+    - name: CIS | Ensure permissions on bootloader config are configured (set)
+      become: true
+      ansible.builtin.file:
+        name: "{{ item.item }}"
+        owner: 'root'
+        group: 'root'
+        mode: '0600'
+      with_items: "{{ stat_data.results }}"
+      when: item.stat.exists
+
+    - name: Create override directory for rescue.service
+      become: true
+      ansible.builtin.file:
+        name: '/etc/systemd/system/rescue.service.d'
+        state: directory
+        owner: 'root'
+        group: 'root'
+        mode: '0755'
+
+    - name: CIS | Ensure authentication is required when booting into rescue mode
+      become: true
+      ansible.builtin.template:
+        src: 'etc/systemd/system/rescue.service.d/override.conf.j2'
+        dest: '/etc/systemd/system/rescue.service.d/override.conf'
+        owner: 'root'
+        group: 'root'
+        mode: '0644'
+
+  # Tags to be applied to this role (block)
+  tags:
+    - 'role_foolean_bootloader'

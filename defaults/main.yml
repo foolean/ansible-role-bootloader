@@ -1,0 +1,27 @@
+# Copyright (c) 2023, Bennett Samowich <bennett@foolean.org>
+# All rights reserved
+# SPDX short identifier: BSD-3-Clause
+---
+
+# bootloader_extra_kernel_params
+#   Additional kernel parameters to be added to /etc/default/grub
+#   (default: null)
+bootloader_extra_kernel_params: null
+
+# bootloader_grub_username
+#   The username used to access and modify boot parameters at startup.
+#   (default: root) Ref: CIS
+bootloader_grub_username: 'root'
+
+# bootloader_grub_password
+#   The password, encrypted with pbkdf2, used to
+#    access and modify boot parameters at startup.
+#
+#   Encode the password with:
+#     grub-mkpasswd-pbkdf2 -s 64
+#     ... or ...
+#     grub2-mkpasswd-pbkdf2 -s 64
+#
+#   (default: 'changeme' encrypted with pbkdf2) Ref: CIS
+bootloader_grub_password: 'grub.pbkdf2.sha512.10000.CCDE52597EFB8655CE2F5385A670AD94095F86DD6BB0CFA44F35CD1A4C04F50B717B21D9584F71E65F300F7F94DBEA3EB11BCE51A83EFE2315D2113AFEBDCBCC.94E761AFDC70E5C9930D5F5F6
+7DEE0CE212755B8ECE28BC0C32E60DC255C7FCD50DFEFF5C99354553F1B586BCC339DB4192B9523344CAB5F62F0A888830DACEB'
