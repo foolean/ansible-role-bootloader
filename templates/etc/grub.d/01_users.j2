@@ -1,6 +1,4 @@
 #!/bin/sh -e
-GRUB2_USERNAME="{{ bootloader_grub_username }}"
-GRUB2_PASSWORD="{{ bootloader_grub_password }}"
 cat << EOF
 if [ -f \${prefix}/user.cfg ]; then
   source \${prefix}/user.cfg

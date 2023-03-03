@@ -9,7 +9,14 @@
 - name: Role foolean/bootloader
   block:
 
-    - name: CIS | Ensure bootloader password is set
+    - name: Set OS variables
+      ansible.builtin.include_vars:
+        file: "{{ item }}"
+      with_first_found:
+        - "{{ ansible_os_family|lower }}.yml"
+        - "default.yml"
+
+    - name: CIS | Ensure bootloader password is set (part-1)
       become: true
       ansible.builtin.template:
         src: 'etc/grub.d/01_users.j2'
@@ -17,6 +24,17 @@
         owner: 'root'
         group: 'root'
         mode: '0755'
+      notify:
+        - Update grub2
+
+    - name: CIS | Ensure bootloader password is set (part-2)
+      become: true
+      ansible.builtin.template:
+        src: 'boot/grub2/user.cfg.j2'
+        dest: "{{ bootloader_usercfg_file }}"
+        owner: 'root'
+        group: 'root'
+        mode: '0600'
 
     - name: CIS | Ensure permissions on bootloader config are configured (stat)
       become: true
@@ -24,9 +42,9 @@
         path: "{{ item }}"
       register: stat_data
       with_items:
-        - '/boot/grub2/grub.cfg'
-        - '/boot/grub2/grubenv'
-        - '/boot/grub2/user.cfg'
+        - "{{ bootloader_grubcfg_file }}"
+        - "{{ bootloader_grubenv_file }}"
+        - "{{ bootloader_usercfg_file }}"
 
     - name: CIS | Ensure permissions on bootloader config are configured (set)
       become: true
@@ -55,6 +73,21 @@
         owner: 'root'
         group: 'root'
         mode: '0644'
+
+    - name: Set allow boot without password
+      ansible.builtin.lineinfile:
+        path: /etc/grub.d/10_linux
+        regexp: '^CLASS="((:?(?!--unrestricted).)*?)"$'
+        line: 'CLASS="\1 --unrestricted"'
+        backup: true
+        backrefs: true
+      notify:
+        - Update grub2
+
+    # Flush any handlers that we might have called
+    - name: Flush handlers
+      ansible.builtin.meta:
+        flush_handlers
 
   # Tags to be applied to this role (block)
   tags:

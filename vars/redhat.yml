@@ -1,0 +1,20 @@
+# Copyright (c) 2023, Bennett Samowich <bennett@foolean.org>
+# All rights reserved
+# SPDX short identifier: BSD-3-Clause
+---
+
+# bootloader_grubcfg_file
+#   Path to the grub.cfg file
+bootloader_grubcfg_file: "/boot/grub2/grub.cfg"
+
+# bootloader_grubenv_file
+#   Path to the grubenv file
+bootloader_grubenv_file: "/boot/grub2/grubenv"
+
+# bootloader_usercfg_file
+#   Path to the user.cfg file
+bootloader_usercfg_file: "/boot/grub2/user.cfg"
+
+# bootloader_update_command
+#   Command to update grub2
+bootloader_update_command: "grub2-mkconfig {{ bootloader_grubcfg_file }}"
