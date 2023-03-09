@@ -89,6 +89,10 @@
       ansible.builtin.meta:
         flush_handlers
 
+  when:
+    # Raspberry handles bootloading differently
+    - ansible_lsb.id|lower != "raspbian"
+
   # Tags to be applied to this role (block)
   tags:
     - 'role_foolean_bootloader'
